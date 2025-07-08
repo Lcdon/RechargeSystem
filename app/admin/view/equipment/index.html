@@ -1,0 +1,80 @@
+{extend name='table'}
+
+{block name="button"}
+<!--{if auth("add")}-->
+<button data-modal='{:url("add")}' data-title="{:lang('添加设备')}" class='layui-btn layui-btn-sm layui-btn-primary'>{:lang('添加设备')}</button>
+<!--{/if}-->
+<!--{if auth("remove")}-->
+<a data-confirm="确定永久删除这些账号吗？" data-table-id="RoleTable" data-action='{:url("remove")}' data-rule="id#{id}" class='layui-btn layui-btn-sm layui-btn-primary'>{:lang('批量删除')}</a>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow">
+    {//include file='equipment/index_search'}
+    <table id="RoleTable" data-url="{:url('list')}" data-target-search="form.form-search"></table>
+</div>
+{/block}
+
+{block name='script'}
+<script>
+    $(function () {
+        // 初始化表格组件
+        $('#RoleTable').layTable({
+            even: true, height: 'full',
+            sort: {field: 'id', type: 'desc'},
+            method: 'post',
+            cols: [[
+                {checkbox: true, fixed: true},
+                {field: 'id', title: '{:lang("ID")}', align: 'center', width: 100},
+                // {field: 'equipment_id', title: '{:lang("设备ID")}', align: 'center', minWidth: 140},
+                {field: 'equipment_name', title: 'Equipment Name', align: 'center', minWidth: 110, templet: '<div>{{d.equipment_name||"-"}}</div>'},
+                {field: 'create_time', title: '{:lang("创建时间")}', align: 'center', minWidth: 110},
+                {field: 'account', title: 'Umrex ID', align: 'center', minWidth: 170},
+                {field: 'password', title: 'Umrex Password', align: 'center', minWidth: 140},
+                {field: 'recharge_id', title: 'Recharge ID', align: 'center', minWidth: 140},
+                {field: 'recharge_password', title: 'Recharge Password', align: 'center', minWidth: 140},
+                // templet: '#StatusSwitchRoleTableTpl'
+                {field: 'initiate_state', title: '{:lang("启动状态")}', align: 'center', minWidth: 140,templet: '#EquipmentStatusSwitch'},
+                {field: 'equipment_state', title: '{:lang("设备状态")}', align: 'center', minWidth: 140},
+                {field: 'equipment_task_state', title: '{:lang("设备执行状态")}', align: 'center', minWidth: 140},
+                {field: 'remark', title: '{:lang("备注")}', align: '备注', minWidth: 140},
+                {toolbar: '#toolbar', title: '{:lang("操作面板")}', align: 'center', minWidth: 180, fixed: 'right'}
+            ]]
+        });
+
+        // 数据状态切换操作
+        layui.form.on('switch(equipment_state_switch)', function (object) {
+            var data = {id:object.value,initiate_state:object.elem.checked > 0 ? 1 : 0}
+            $.form.load("{:url('initiate_state')}", data, 'post', function (ret) {
+                if (ret.code < 1) $.msg.error(ret.info, 3, function () {
+                    $('#RoleTable').trigger('reload');
+                }); else {
+                    $('#RoleTable').trigger('reload');
+                }
+                return false;
+            }, false);
+        });
+    });
+</script>
+
+<script type="text/html" id="toolbar">
+    <a class="layui-btn layui-btn-sm" data-event-dbclick data-title="{:lang('编辑')}" data-modal='{:url("edit")}?}' data-value="id#{{d.id}}">{:lang('编 辑')}</a>
+    <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="{:lang('确定要永久删除吗？')}" data-action="{:url('remove')}" data-value="id#{{d.id}}">{:lang('删 除')}</a>
+</script>
+
+<!--&lt;!&ndash; 列表排序权重模板 &ndash;&gt;-->
+<!--<script type="text/html" id="SortInputRoleTableTpl">-->
+<!--    <input type="number" min="0" data-blur-number="0" data-action-blur="{:request()->url()}" data-value="id#{{d.id}};action#sort;sort#{value}" data-loading="false" value="{{d.sort}}" class="layui-input text-center">-->
+<!--</script>-->
+
+<!--&lt;!&ndash; 数据状态切换模板 &ndash;&gt;-->
+<script type="text/html" id="EquipmentStatusSwitch">
+    {if auth("initiate_state")}
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="ON|OFF" lay-filter="equipment_state_switch" {{-d.initiate_state>0?'checked':''}}>
+    {else}
+    {{-d.status ? '<b class="color-green">{:lang("已启用")}</b>' : '<b class="color-red">{:lang("已禁用")}</b>'}}
+    {/if}
+</script>
+
+{/block}

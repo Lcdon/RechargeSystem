@@ -1,0 +1,66 @@
+<form action="{:sysuri()}" method="post" data-auto="true" class="layui-form layui-card" data-table-id="UserTable">
+    <div class="layui-card-body padding-left-40">
+
+        <fieldset class="layui-bg-gray">
+            <div class="layui-row layui-col-space15">
+<!--                <div class="layui-col-xs5">-->
+<!--                    <label class="block relative">-->
+<!--                        <span class="help-label"><b>{:lang('设备ID')}</b></span>-->
+<!--                    </label>-->
+<!--                    <input name="equipment_id" value='{$vo.equipment_id|default=""}' required  placeholder="请输入内容" class="layui-input">-->
+<!--                </div>-->
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label"><b>Equipment Name</b></span>
+                    </label>
+                    <input name="equipment_name" value='{$vo.equipment_name|default=""}' required  placeholder="请输入内容" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label"><b>Umrex ID</b></span>
+                    </label>
+                    <input name="account" value='{$vo.account|default=""}' required  placeholder="请输入内容" class="layui-input">
+                </div>
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label"><b>Umrex Password</b></span>
+                    </label>
+                    <input name="password" value='{$vo.password|default=""}' required  placeholder="请输入内容" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label"><b>Recharge ID</b></span>
+                    </label>
+                    <input name="recharge_id" value='{$vo.recharge_id|default=""}' required  placeholder="请输入内容" class="layui-input">
+                </div>
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label"><b>Recharge Password</b></span>
+                    </label>
+                    <input name="recharge_password" value='{$vo.recharge_password|default=""}' required  placeholder="请输入内容" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-xs5" style="width:83%">
+                    <label class="block relative">
+                        <span class="help-label"><b>{:lang('备注')}</b></span>
+                    </label>
+                    <textarea placeholder="请输入内容" class="layui-textarea" name="remark">{$vo.remark|default=""}</textarea>
+                </div>
+            </div>
+
+        </fieldset>
+    </div>
+
+    <div class="hr-line-dashed"></div>
+    {notempty name='vo.id'}<input type='hidden' value='{$vo.id}' name='id'>{/notempty}
+
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type='submit'>{:lang('保存数据')}</button>
+        <button class="layui-btn layui-btn-danger" type='button' data-close>{:lang('取消编辑')}</button>
+    </div>
+</form>

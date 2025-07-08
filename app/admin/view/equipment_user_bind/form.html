@@ -1,0 +1,48 @@
+<form action="{:sysuri()}" method="post" data-auto="true" class="layui-form layui-card" data-table-id="UserTable">
+    <div class="layui-card-body padding-left-40">
+
+        <fieldset class="layui-bg-gray">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label"><b>User</b></span>
+                    </label>
+                    <select lay-search="" name="system_user_id" lay-verify="required">
+                        {if $page_type eq 'add'}
+                        <option value="">请选择或搜索（默认不区分大小写）</option>
+                        {/if}
+                        {volist name='users' id='item'}
+                        <option value="{$item.id}">{$item.username}({$item.nickname})</option>
+                        {/volist}
+                    </select>
+                </div>
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label"><b>Code Name</b></span>
+                    </label>
+                    <select lay-search="" name="equipment_id" lay-verify="required">
+                        {if $page_type eq 'add'}
+                        <option value="">请选择或搜索（默认不区分大小写）</option>
+                        {/if}
+                        {volist name='equipments' id='item'}
+                        {if $item['default'] eq 1}
+                        <option value="{$item.id}" selected>{$item.equipment_name}</option>
+                        {else}
+                        <option value="{$item.id}">{$item.equipment_name}</option>
+                        {/if}
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+
+        </fieldset>
+    </div>
+
+    <div class="hr-line-dashed"></div>
+    {notempty name='id'}<input type='hidden' value='{$id}' name='id'>{/notempty}
+
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type='submit'>{:lang('保存数据')}</button>
+        <button class="layui-btn layui-btn-danger" type='button' data-close>{:lang('取消编辑')}</button>
+    </div>
+</form>

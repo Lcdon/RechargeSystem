@@ -1,0 +1,42 @@
+{extend name='table'}
+
+{block name="button"}
+<button data-modal='{:url("add")}' data-title="Add Mac Address" class='layui-btn layui-btn-sm layui-btn-primary'>Add Mac Address</button>
+<a data-confirm="sure？" data-table-id="RoleTable" data-action='{:url("remove")}' data-rule="id#{id}" class='layui-btn layui-btn-sm layui-btn-primary'>{:lang('批量删除')}</a>
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow">
+    <table id="OplogData" data-url="{:sysuri('index')}" data-target-search="form.form-search"></table>
+</div>
+{/block}
+
+{block name='script'}
+<script>
+    $(function () {
+        // 动态创建 layui.table 表格
+        $('#OplogData').layTable({
+            even: true, height: 'full',
+            sort: {field: 'id', type: 'desc'},
+            cols: [[
+                {checkbox: true},
+                {field: 'id', title: 'ID', width: 80, sort: true, align: 'center'},
+                {field: 'mac_address', title: 'Mac Address', minWidth: 100, align: 'center'},
+                {toolbar: '#toolbar', title: 'Edit Tool', align: 'center', fixed: 'right'}
+            ]]
+        });
+
+        //  监听原 layui.table 的 toolbar 事件
+        $('#OplogData').trigger('toolbar', function (item) {
+            // 对应 layui.table 写法 layui.table.on('toolbar(OplogData)',function(){ })
+        })
+    });
+</script>
+
+<script type="text/html" id="toolbar">
+    <!--{if auth('remove')}-->
+    <a data-action='{:url("remove")}' data-value="id#{{d.id}}" data-confirm="确认要删除这条记录吗？" class="layui-btn layui-btn-sm layui-btn-danger">delete</a>
+    <!--{/if}-->
+</script>
+
+{/block}

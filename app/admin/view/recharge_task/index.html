@@ -1,0 +1,108 @@
+{extend name='table'}
+
+{block name="button"}
+<!--{if auth("add")}-->
+<button data-modal='{:url("add")}' data-title="{:lang('添加设备')}" class='layui-btn layui-btn-sm layui-btn-primary'>add Task</button>
+<!--{/if}-->
+<!--{if auth("remove")}-->
+<a data-confirm="确定永久删除这些账号吗？" data-table-id="RoleTable" data-action='{:url("remove")}' data-rule="id#{id}" class='layui-btn layui-btn-sm layui-btn-primary'>{:lang('批量删除')}</a>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow">
+    {include file='recharge_task/index_search'}
+    <table id="RoleTable" data-url="{:url('List')}" data-target-search="form.form-search"></table>
+</div>
+{/block}
+
+{block name='script'}
+<script>
+    $(function () {
+        // 初始化表格组件
+        $('#RoleTable').layTable({
+            even: true, height: 'full',
+            // sort: {field: 'sort desc,id', type: 'desc'},
+            method: 'post',
+            cols: [[
+                {checkbox: true, fixed: true},
+                {field: 'id', title: 'ID', align: 'center', width: 100, sort: true},
+                {field: 'username', title: 'Creator', align: 'center', width: 100},
+                {field: 'equipment_name', title: 'Code Name', align: 'center', minWidth: 110,templet: '<div>{{d.equipment_name||"-"}}</div>'},
+                {field: 'recharge_tel', title: 'MSISDN', align: 'center', minWidth: 170},
+                {field: 'amount', title: 'ER Amount', align: 'center', minWidth: 140},
+                {field: 'state', title: 'Status', align: 'center', minWidth: 140, templet:function (d){
+                    if(d.state==='Success'){
+                        return '<span style="color:green;font-weight: bold;">'+d.state+'</span>';
+                    }else if(d.state==='Fail'){
+                        return '<span style="color:red;font-weight: bold;">'+d.state+'</span>'
+                    }else if(d.state==='Running'){
+                        return '<span style="color:blue;font-weight: bold;">'+d.state+'</span>'
+                    }else if(d.state==='Cancel'){
+                        return '<span style="color:grey;font-weight: bold;">'+d.state+'</span>'
+                    }else{
+                        return '<span style="color:black;font-weight: bold;">'+d.state+'</span>'
+                    }
+                }},
+                {field: 'recharge_result', title: 'ER Result', align: 'center', minWidth: 140},
+                {field: 'transaction_id', title: 'Transaction ID', align: 'center', minWidth: 140},
+                {field: 'balance', title: 'ER Balance', align: 'center', minWidth: 140},
+                {field: 'create_time', title: 'Create Time', align: 'center', minWidth: 110},
+                {field: 'begin_time', title: 'Begin Time', align: 'center', minWidth: 140},
+                {field: 'recharge_time', title: 'ER Time', align: 'center', minWidth: 140},
+                // templet: '#StatusSwitchRoleTableTpl'
+                {toolbar: '#toolbar', title: 'Cancel Task', align: 'center', minWidth: 180, fixed: 'right'}
+            ]]
+        });
+    });
+
+    layui.use(function(){
+        var upload = layui.upload;
+        var layer = layui.layer;
+        var table = layui.table;
+        var form = layui.form;
+        // 渲染
+        upload.render({
+            elem: '.demo-class-accept', // 绑定多个元素
+            url: '{:url("import")}', // 此处配置你自己的上传接口即可
+            accept: 'file', // 普通文件
+            acceptMime:'.xlsx,.xls',
+            done: function(res){
+                layer.alert(res.msg);
+                $('#RoleTable').trigger('reload');
+            }
+        });
+
+        //点击下载
+        form.on('submit(submitForm)', function(data){
+            // 获取表单的值
+            var formData = data.field; // 得到的是一个对象，key 是表单的 name 属性，value 是用户输入的值
+            var queryString = $.param(formData);
+
+            // 组合成 GET 请求的 URL
+            var url = "{:url('downExcel')}?" + queryString;
+            //跳转
+            window.location.href=url
+        });
+    });
+
+
+
+
+
+
+
+</script>
+
+<script type="text/html" id="toolbar">
+    {{# if(d.state === 'Waiting' || d.state === 'Running'){ }}
+    <a class="layui-btn layui-btn-sm layui-bg-blue" data-confirm="Confirm the cancellation?" data-action="{:url('cancel')}" data-value="id#{{d.id}}">Cancel</a>
+    {{# }else{ }}
+    <a class="layui-btn layui-btn-sm layui-btn-disabled">Cancel</a>
+    {{# } }}
+<!--    <a class="layui-btn layui-btn-sm" data-event-dbclick data-title="{:lang('编辑')}" data-modal='{:url("edit")}?}' data-value="id#{{d.id}}">{:lang('编 辑')}</a>-->
+<!--    <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="{:lang('确定要永久删除吗？')}" data-action="{:url('remove')}" data-value="id#{{d.id}}">Cancel</a>-->
+<!--<a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="Confirm the cancellation?" data-action="{:url('cancel')}" data-value="id#{{d.id}}">Cancel</a>-->
+</script>
+
+{/block}

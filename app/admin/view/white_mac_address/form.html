@@ -1,0 +1,22 @@
+<form action="{:sysuri()}" method="post" data-auto="true" class="layui-form layui-card" data-table-id="UserTable">
+    <div class="layui-card-body padding-left-40">
+
+        <fieldset class="layui-bg-gray">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label">IP</span>
+                        <input name="mac_address" value='{$vo.ip|default=""}' required vali-name="ip" placeholder="Please input" class="layui-input">
+                    </label>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+    <div class="hr-line-dashed"></div>
+    {notempty name='vo.id'}<input type='hidden' value='{$vo.id}' name='id'>{/notempty}
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type='submit'>保存数据</button>
+        <button class="layui-btn layui-btn-danger" type='button' data-close>取消编辑</button>
+    </div>
+</form>

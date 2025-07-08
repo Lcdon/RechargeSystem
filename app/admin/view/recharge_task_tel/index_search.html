@@ -1,0 +1,84 @@
+<fieldset>
+    <legend>{:lang('条件搜索')}</legend>
+    <form id="myForm" class="layui-form layui-form-pane form-search" action="{:sysuri()}" onsubmit="return false" method="get" autocomplete="off">
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">Creator</label>
+            <div class="layui-input-inline">
+                <select name="system_user_id" lay-search class="layui-select">
+                    <option value=''>-- all --</option>
+                    {foreach $user_list as $user}
+                    <option value="{$user.id|default=''}">{$user.username|default=''}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">Equipment name</label>
+            <div class="layui-input-inline">
+                <select name="equipment_id" lay-search class="layui-select">
+                    <option value=''>-- all --</option>
+                    {foreach $equipment_list as $v}
+                    <option value="{$v.id|default=''}">{$v.equipment_name|default=''}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">Status</label>
+            <div class="layui-input-inline">
+                <select name="state" lay-search class="layui-select">
+                    <option value=''>-- all --</option>
+                    {foreach $state as $v}
+                    <option value="{$v.key|default=''}">{$v.value|default=''}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">{:lang('创建时间')}</label>
+            <div class="layui-input-inline">
+                <input data-date-range name="create_time" value="{$get.create_at|default=''}" placeholder="-- Select Time --" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">Begin time</label>
+            <div class="layui-input-inline">
+                <input data-date-range name="begin_time" value="{$get.create_at|default=''}" placeholder="-- Select Time --" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">Recharge time</label>
+            <div class="layui-input-inline">
+                <input data-date-range name="recharge_time" value="{$get.create_at|default=''}" placeholder="-- Select Time --" class="layui-input">
+            </div>
+        </div>
+        
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">MISSION</label>
+            <div class="layui-input-inline">
+                <input name="recharge_tel" value="" placeholder="-- MISSION --" class="layui-input">
+            </div>
+        </div>
+        
+        <div class="layui-form-item layui-inline">
+            <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i> {:lang('搜 索')}</button>
+        </div>
+        <div class="layui-form-item layui-inline">
+            <button type="button" class="layui-btn demo-class-accept" lay-options="{accept: 'file'}">
+                <i class="layui-icon layui-icon-upload"></i>
+                {:lang('导入任务')}
+            </button>
+        </div>
+        <div class="layui-form-item layui-inline">
+            <button type="button" class="layui-btn" lay-submit lay-filter="submitForm">
+                <i class="layui-icon layui-icon-upload"></i>
+                Download
+            </button>
+        </div>
+    </form>
+</fieldset>
