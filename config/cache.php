@@ -16,7 +16,7 @@
 
 return [
     // 默认缓存驱动
-    'default' => 'file',
+    'default' => 'redis',
     // 缓存连接配置
     'stores'  => [
         'file' => [
@@ -46,6 +46,26 @@ return [
             'tag_prefix' => 'tag:',
             // 序列化机制
             'serialize'  => [],
+        ],
+        'redis'   => [
+            // 驱动方式
+            'type'   => 'redis',
+            // 服务器地址
+            'host'   => env('redis.host', '127.0.0.1'),
+            // 端口
+            'port'   => env('redis.port', 6379),
+            // 密码
+            'password' => env('redis.password', ''),
+            // 缓存有效期
+            'expire'  => 0,
+            // 缓存前缀
+            'prefix'  => env('cache.prefix', ''),
+            // 数据库索引
+            'select'  => intval(env('redis.select', 0)),
+            // 连接超时
+            'timeout' => 0,
+            // 是否持久化连接
+            'persistent' => false,
         ],
     ],
 ];
