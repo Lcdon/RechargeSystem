@@ -52,4 +52,6 @@ return [
     ],
     // 其他配置项...
     'lang' => 'en',
+
+    'mac_address_check_switch' => false,
 ];
