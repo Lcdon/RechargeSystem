@@ -1,0 +1,31 @@
+<?php
+declare (strict_types = 1);
+
+namespace app\command;
+
+use think\console\Command;
+use think\console\Input;
+//use think\console\input\Argument;
+//use think\console\input\Option;
+use think\console\Output;
+use app\service\RechargeTaskService;
+use think\facade\Queue;
+
+class pushTask extends Command
+{
+    protected function configure()
+    {
+        // 指令配置
+        $this->setName('push_task')
+            ->setDescription('the push_task command');
+    }
+
+    protected function execute(Input $input, Output $output)
+    {
+        // 指令输出
+        $output->writeln('开始执行推送任务');
+        $rechargeTaskService = new RechargeTaskService();
+        $rechargeTaskService->pushTask();
+        $output->writeln('推送任务执行完毕');
+    }
+}
