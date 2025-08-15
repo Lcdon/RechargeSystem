@@ -6,11 +6,17 @@ use app\admin\model\EquipmentModel;
 use app\admin\model\EquipmentUserBindModel as EUB;
 use app\admin\model\RechargeTaskModel as RT;
 use app\service\RechargeTaskService;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
+use think\db\exception\ModelNotFoundException;
+use think\facade\Cache;
 use think\facade\View;
+
 use \PhpOffice\PhpSpreadsheet\IOFactory;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use \PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use think\admin\model\SystemUser;
+use think\response\Json;
 
 /**
  * 充值任务
@@ -20,12 +26,15 @@ use think\admin\model\SystemUser;
 
 class RechargeTask extends Base
 {
-    protected $system_user_model;
-    protected $equipment_model;
-    protected $equipment_user_bind_model;
-    protected $recharge_task_service;
+    protected array $noNeedLogin = ['pop_task_api'];
+    protected array $noNeedAuth = ['pop_task_api'];
 
-    protected $state = [
+    protected SystemUser $system_user_model;
+    protected EquipmentModel $equipment_model;
+    protected EUB $equipment_user_bind_model;
+    protected RechargeTaskService $recharge_task_service;
+
+    protected array $state = [
         ['key'=>0,  'value'=>'Waitting'],
         ['key'=>1,  'value'=>'Running'],
         ['key'=>2,  'value'=>'Success'],
@@ -78,7 +87,7 @@ class RechargeTask extends Base
      * 任务列表
      * @auth true
      */
-    public function List(): \think\response\Json
+    public function List(): Json
     {
         $page = input('page',1);
         $limit = input('limit',10);
@@ -129,6 +138,11 @@ class RechargeTask extends Base
             $params['system_user_id'] = session('user')['id'];
             $params['username'] = session('user')['username'];
             $params['recharge_method'] = input('recharge_method');
+            if($params['equipment_id']){
+                $params['equipment_name'] = $this->equipment_model
+                    ->where('id',$params['equipment_id'])
+                    ->value('equipment_name');
+            }
             $params['state'] = 0;
             $params['state_msg'] = 'waiting';
             $params['create_time'] = date('Y-m-d H:i:s');
@@ -363,6 +377,9 @@ class RechargeTask extends Base
 
     /** 生成excel
      * @return void
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function downExcel()
     {
@@ -453,17 +470,4 @@ class RechargeTask extends Base
             echo 'error';
         }
     }
-
-    /**
-     * 派发任务
-     * @return void
-     */
-    public function pop_task_api(){
-        $equipment_id = input('equipment_id');
-        $key = 'recharge_task_'.$equipment_id;
-        //检查这个任务是否正在进行中
-        $cache = new Cache();
-        $task = $cache->get($key);
-    }
-
 }

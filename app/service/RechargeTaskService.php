@@ -97,8 +97,9 @@ class RechargeTaskService
         $redis = Cache::store('redis')->handler();
         $recharge_task = $this->recharge_task_model->where('state',0)->select()->toArray();
         foreach ($recharge_task as $task){
+            $recharge_method = $task['recharge_method'];
             if($task['equipment_id']){
-                $queue_name = 'equipment_'.$task['equipment_id'];
+                $queue_name = $recharge_method.'_equipment_'.$task['equipment_id'];
             }else{
                 $item = $this->equipment_user_bind_model
                     ->alias('eub')
@@ -107,12 +108,16 @@ class RechargeTaskService
                     ->order('sort')
                     ->find()->toArray();
                 if($item){
-                    $queue_name = 'equipment_'.$item['equipment_id'];
+                    $queue_name = $recharge_method.'_equipment_'.$item['equipment_id'];
                 }else{
                     continue;
                 }
             }
-            if(!in_array($task['id'], $redis->lrange($queue_name, 0, -1))){
+            $res = $redis->lrange($queue_name, 0, -1);
+            if(!$res) $res = [];
+            if(!in_array($task['id'], $res)){
+                echo $queue_name.':'.$task['id'].PHP_EOL;
+                $this->recharge_task_model->where('id',$task['id'])->update(['state'=>1,'state_msg'=>'待充值']);
                 $redis->lpush($queue_name, $task['id']);
             }
         }

@@ -30,8 +30,8 @@ use think\admin\service\AdminService;
  */
 class Base extends Controller
 {
-    protected $is_manager = 0;
-    protected $is_admin = 0;
+    protected int $is_manager = 0;
+    protected int $is_admin = 0;
 
     /**
      * 初始化操作
@@ -41,6 +41,7 @@ class Base extends Controller
         if (!AdminService::isLogin()) {
             $this->redirect(sysuri('admin/index/index'));
         }
+
         $authorize = session('user')['authorize'];
         $authorize = explode(',',$authorize);
         if(in_array('2',$authorize)){
