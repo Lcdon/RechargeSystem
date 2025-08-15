@@ -18,6 +18,9 @@
 
 {block name='script'}
 <script>
+    var showErBalance = {$show_er_balance|default=false}; // 从控制器传递的值
+    var showCodeName = {$show_code_name|default=false};
+
     $(function () {
         // 初始化表格组件
         $('#RoleTable').layTable({
@@ -28,7 +31,7 @@
                 {checkbox: true, fixed: true},
                 {field: 'id', title: 'ID', align: 'center', width: 100, sort: true},
                 {field: 'username', title: 'Creator', align: 'center', width: 100},
-                {field: 'equipment_name', title: 'Code Name', align: 'center', minWidth: 110,templet: '<div>{{d.equipment_name||"-"}}</div>'},
+                {field: 'equipment_name', title: 'Code Name', align: 'center', minWidth: 110,templet: '<div>{{d.equipment_name||"-"}}</div>',hide:!showCodeName},
                 {field: 'recharge_tel', title: 'MSISDN', align: 'center', minWidth: 170},
                 {field: 'amount', title: 'ER Amount', align: 'center', minWidth: 140},
                 {field: 'state', title: 'Status', align: 'center', minWidth: 140, templet:function (d){
@@ -46,10 +49,11 @@
                 }},
                 {field: 'recharge_result', title: 'ER Result', align: 'center', minWidth: 140},
                 {field: 'transaction_id', title: 'Transaction ID', align: 'center', minWidth: 140},
-                {field: 'balance', title: 'ER Balance', align: 'center', minWidth: 140},
+                {field: 'balance', title: 'ER Balance', align: 'center', minWidth: 140, hide:!showErBalance},
                 {field: 'create_time', title: 'Create Time', align: 'center', minWidth: 110},
                 {field: 'begin_time', title: 'Begin Time', align: 'center', minWidth: 140},
                 {field: 'recharge_time', title: 'ER Time', align: 'center', minWidth: 140},
+                {field: 'user_balance', title: 'user_balance', align: 'center', minWidth: 140},
                 // templet: '#StatusSwitchRoleTableTpl'
                 {toolbar: '#toolbar', title: 'Cancel Task', align: 'center', minWidth: 180, fixed: 'right'}
             ]]
@@ -85,12 +89,6 @@
             window.location.href=url
         });
     });
-
-
-
-
-
-
 
 </script>
 

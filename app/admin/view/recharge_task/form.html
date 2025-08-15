@@ -7,22 +7,32 @@
                     <label class="block relative">
                         <span class="help-label"><b>Equipment Name</b></span>
                     </label>
-                    {if $user_id eq 10000}
+                    {if $is_master == 1}
                     <select lay-search="" name="equipment_id" lay-verify="required">
                         <option value="">请选择或搜索</option>
                         {volist name='equipments' id='item'}
-                        {if isset($vo.equipment_id) and $vo.equipment_id eq $item.id}
-                        <option value="{$item.id}" selected>{$item.equipment_name}</option>
-                        {else}
                         <option value="{$item.id}">{$item.equipment_name}</option>
-                        {/if}
                         {/volist}
                     </select>
                     {else}
-                    <div>{$equipments.equipment_name}</div>
+                    <select lay-search="" name="equipment_id" lay-verify="required">
+                        {volist name='equipments' id='item'}
+                        <option value="{$item.id}">{$item.equipment_name}</option>
+                        {/volist}
+                    </select>
                     {/if}
-                    
                 </div>
+
+                <div class="layui-col-xs5">
+                    <label class="block relative">
+                        <span class="help-label"><b>Recharge Method</b></span>
+                    </label>
+                    <select lay-search="" name="recharge_method" lay-verify="required">
+                        <option value="app">app</option>
+                        <option value="tel">tel</option>
+                    </select>
+                </div>
+
             </div>
             <div class="layui-row layui-col-space15">
                 <div class="layui-col-xs5">

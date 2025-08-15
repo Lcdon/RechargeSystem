@@ -5,13 +5,13 @@ namespace app\admin\controller;
 use app\admin\model\EquipmentModel;
 use app\admin\model\EquipmentUserBindModel as EUB;
 use app\admin\model\RechargeTaskModel as RT;
-use think\admin\service\AdminService;
+use app\service\RechargeTaskService;
+use think\facade\Cache;
 use think\facade\View;
 use \PhpOffice\PhpSpreadsheet\IOFactory;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use \PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use think\admin\model\SystemUser;
-use think\facade\Request;
 
 /**
  * 充值任务
@@ -21,6 +21,27 @@ use think\facade\Request;
 
 class RechargeTask extends Base
 {
+    protected $system_user_model;
+    protected $equipment_model;
+    protected $equipment_user_bind_model;
+    protected $recharge_task_service;
+
+    protected $state = [
+        ['key'=>0,  'value'=>'Waitting'],
+        ['key'=>1,  'value'=>'Running'],
+        ['key'=>2,  'value'=>'Success'],
+        ['key'=>-1, 'value'=>'Fail'],
+        ['key'=>3, 'value'=>'Cancel'],
+    ];
+
+    public function __construct(){
+        parent::__construct();
+        $this->system_user_model = new SystemUser();
+        $this->equipment_model = new EquipmentModel();
+        $this->equipment_user_bind_model = new EUB();
+        $this->recharge_task_service = new RechargeTaskService();
+    }
+
     /**
      * 任务页面
      * @auth true
@@ -28,19 +49,29 @@ class RechargeTask extends Base
      */
     public function index()
     {
+        $user_id = session('user')['id'];
+        $show_er_balance = 'false';
+        $show_code_name = 'false';
+        if ($this->is_admin || $this->is_manager){
+            $user_list = $this->system_user_model->field('id,username')->select()->toArray();
+            $equipment_list = $this->equipment_model->field('id,equipment_name')->select()->toArray();
+            $show_er_balance = 'true';
+            $show_code_name = 'true';
+        }else{
+            $user_list = $this->system_user_model->field('id,username')->where('id',$user_id)->select()->toArray();
+            $query = $this->equipment_model
+                ->alias('e')
+                ->leftJoin($this->equipment_user_bind_model->getTable().' eub','e.id=eub.equipment_id')
+                ->field('e.id,e.equipment_name')->where('system_user_id',$user_id)->select();
+            $equipment_list = $query->toArray();
+        }
+
         View::assign('title',lang('任务列表'));
-        $user_list = SystemUser::field('id,username')->select()->toArray();
         View::assign('user_list',$user_list);
-        $equipment_list = EquipmentModel::field('id,equipment_name')->select()->toArray();
         View::assign('equipment_list',$equipment_list);
-        $state = [
-            ['key'=>0,  'value'=>'Waitting'],
-            ['key'=>1,  'value'=>'Running'],
-            ['key'=>2,  'value'=>'Success'],
-            ['key'=>-1, 'value'=>'Fail'],
-            ['key'=>3, 'value'=>'Cancel'],
-        ];
-        View::assign('state',$state);
+        View::assign('state',$this->state);
+        View::assign('show_er_balance',$show_er_balance);
+        View::assign('show_code_name',$show_code_name);
         return View::fetch();
     }
 
@@ -48,55 +79,28 @@ class RechargeTask extends Base
      * 任务列表
      * @auth true
      */
-    public function List()
+    public function List(): \think\response\Json
     {
-        $data = $this->_vali([
-            'page.require'=>'page is null',
-            'limit.require'=>'limit is null',
-            '_order_.default'=>'asc',
-            'state.default'=>null
-        ]);
-        $page = $data['page'];
-        $limit = $data['limit'];
-        $offset = ($page - 1) * $limit;
+        $page = input('page',1);
+        $limit = input('limit',10);
 
-        if(session('user')['username']=='admin'){
-            $equal = 'system_user_id,equipment_id';
-            if(!empty($data['state']) or $data['state']=='0'){
-                $equal .= ',state';
-            }
-            if(!empty($_POST['recharge_tel'])){
-                $equal .= ',recharge_tel';
-            }
-            $query = RT::mQuery()
-                ->equal($equal)
-                ->dateBetween('create_time,begin_time,recharge_time')
-                ->order('id '.$data['_order_'])
-                ->limit($offset,$limit);
-            $binds = $query->select()->toArray();
-            $count = $query->count();
+        $params['state'] = input('state',null);
+        $params['recharge_method'] = input('recharge_method','');
+
+        if(!$this->is_admin && !$this->is_manager) {
+            $params['system_user_id'] = session('user')['id'];
         }else{
-            $equal = '';
-            if(!empty($data['state']) or $data['state']=='0'){
-                $equal .= ',state';
-            }
-            if(!isset($_POST['recharge_tel']) or !empty($_POST['recharge_tel'])){
-                $equal .= ',recharge_tel';
-            }
-            $equal = ltrim($equal, ',');
-            $query = RT::mQuery()
-                ->where('system_user_id',session('user')['id'])
-                ->equal($equal)
-                ->dateBetween('create_time,begin_time,recharge_time')
-                ->order('id '.$data['_order_'])
-                ->limit($offset,$limit);
-            $binds = $query->select()->toArray();
-            $count = $query->count();
+            $params['system_user_id'] = input('system_user_id');
         }
-        $response['code']   = 0;
-        $response['count']  = $count;
-        $response['data']   = $binds;
-        return json($response);
+
+        $params['equipment_id'] = input('equipment_id',null);
+        $params['recharge_tel'] = input('recharge_tel',null);
+        $params['begin_time'] = input('begin_time',null);
+        $params['recharge_time'] = input('recharge_time',null);
+        $params['create_time'] = input('create_time',null);
+
+        $result = $this->recharge_task_service->getRechargeTaskList($params,$page,$limit);
+        return json($result);
     }
 
     /**
@@ -107,59 +111,52 @@ class RechargeTask extends Base
     {   
         $user_id = session('user')['id'];
         if(request()->isPost()){
+            $params['recharge_tel'] = input('recharge_tel','');
+            if(!$params['recharge_tel']){
+                return json(['code'=>CodeMsg('fail'),'msg'=>'recharge_tel is null']);
+            }
+            $params['amount'] = input('amount',0);
+            if(!$params['amount']){
+                return json(['code'=>CodeMsg('fail'),'msg'=>'amount is null']);
+            }
 
-            $data = $this->_vali([
-                'recharge_tel.require'=>'recharge_tel is null',
-                'amount.require'=>'amount is null',
-                ]);
-
-            if($data['amount']<5 or $data['amount']>200){
+            if($params['amount']<5 or $params['amount']>200){
                 $response['code'] = CodeMsg('fail');
                 $response['msg'] = 'recharge amount needs to be between 5 and 200';
                 return json($response);
             }
-            if(isset($_POST['equipment_id'])){
-                $equipment_id = $_POST['equipment_id'];
-                $data['equipment_id'] = $equipment_id;
-            }
-            if($user_id!=10000) {
-                $equipment_id = $this->getUserEquipmentid($user_id);
-                if (!empty($equipment_id)) $data['equipment_id'] = $equipment_id;
-            }
-            if(!empty($data['equipment_id'])){
-                $data['equipment_name'] = EquipmentModel::where(['id'=>$data['equipment_id']])->find()->equipment_name;
-            }
-            $data['system_user_id'] = session('user')['id'];
-            $data['username'] = session('user')['username'];
-            $data['state'] = 0;
-            $data['state_msg'] = '待分配';
-            $add = new RT;
-            $add->save($data);
-            $response['code'] = CodeMsg('success');
-            $response['msg'] = 'success';
-            return json($response);
-        }else{
-            if($user_id==10000){
-                $equipments = EquipmentModel::field('id,equipment_name')
-                ->select()->toArray();
-                View::assign('equipments',$equipments);
+
+            $params['equipment_id'] = input('equipment_id','');
+            $params['system_user_id'] = session('user')['id'];
+            $params['username'] = session('user')['username'];
+            $params['recharge_method'] = input('recharge_method');
+            $params['state'] = 0;
+            $params['state_msg'] = 'waiting';
+            $params['create_time'] = date('Y-m-d H:i:s');
+            $res = $this->recharge_task_service->add($params);
+            if($res){
+                return json(['code'=>CodeMsg('success'),'msg'=>'ok']);
             }else{
-                $equipments = EquipmentModel::hasWhere('equipment_user_bind',['system_user_id'=>$user_id])
-                ->field('EquipmentModel.id,equipment_name')
-                ->find();
-                if(!$equipments){
-                    $equipments = [];
-                    $equipments['equipment_name'] = '未绑定设备';
-                }else{
-                    $equipments = $equipments->toArray();
-                }
-                View::assign('equipments',$equipments);
+                return json(['code'=>CodeMsg('fail'),'msg'=>'fail']);
             }
-            View::assign('user_id',$user_id);
+        }else{
+            $is_master = 0;
+            if($this->is_admin || $this->is_manager){
+                $is_master = 1;
+                $equipments = $this->equipment_model
+                    ->field('id,equipment_name')
+                    ->select()->toArray();
+            }else{
+                $equipments = $this->equipment_model
+                    ->hasWhere('equipment_user_bind',['system_user_id'=>$user_id])
+                    ->field('EquipmentModel.id,equipment_name')
+                    ->select()->toArray();
+            }
+            View::assign('equipments',$equipments);
+            View::assign('is_master',$is_master);
             return View::fetch('form');
         }
     }
-
 
 
     /**
@@ -300,14 +297,35 @@ class RechargeTask extends Base
             }
         }
 
+        if($user_id!=10000){//普通用户
+            $equipment_id = $this->getUserEquipmentid($user_id);
+            $user_equipment = EquipmentModel::where('id',$equipment_id)->find();
+        }else{//管理员
+            $equipments = EquipmentModel::select();
+            $equipment_dict = [];
+            foreach ($equipments as $value){
+                $equipment_dict[$value['equipment_name']] = $value;
+            }
+        }
+
         $list = [];
         foreach ($sheetData as $key=>$value){
             if($user_id!=10000){
-                $equipment = $this->getUserEquipmentid($user_id);
+                $equipment = $user_equipment;
             }else{
-                $equipment = EquipmentModel::where('equipment_name',$value['equipment_name'])->find();
+                if(!empty($value['equipment_name'])){
+                    if(array_key_exists($value['equipment_name'], $equipment_dict)) {
+                        $equipment = $equipment_dict[$value['equipment_name']];
+                    }
+                    else{
+                        $Err.='row:'.($key+1).','.$value['equipment_name'].':this equipment is not exist<br>';
+                        continue;
+                    }
+                }else{
+                    $equipment = NULL;
+                }
             }
-            
+
             if($value['amount']<5 or $value['amount']>20){
                 $Err.='row:'.($key+1).','.$value['equipment_name'].':amount is no between 5 and 20<br>';
                 continue;
@@ -429,12 +447,24 @@ class RechargeTask extends Base
      */
     public function user_daily_limit_update()
     {
-        $result = SystemUser::execute("UPDATE system_user set daily_limit_remain=daily_limit;");
+        $result = $this->system_user_model->execute("UPDATE system_user set daily_limit_remain=daily_limit;");
         if($result){
             echo 'success';
         }else{
             echo 'error';
         }
+    }
+
+    /**
+     * 派发任务
+     * @return void
+     */
+    public function pop_task_api(){
+        $equipment_id = input('equipment_id');
+        $key = 'recharge_task_'.$equipment_id;
+        //检查这个任务是否正在进行中
+        $cache = new Cache();
+        $task = $cache->get($key);
     }
 
 }
