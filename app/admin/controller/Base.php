@@ -30,10 +30,24 @@ use think\admin\service\AdminService;
  */
 class Base extends Controller
 {
+    protected $is_manager = 0;
+    protected $is_admin = 0;
+
+    /**
+     * 初始化操作
+     */
     public function __construct()
     {
         if (!AdminService::isLogin()) {
             $this->redirect(sysuri('admin/index/index'));
+        }
+        $authorize = session('user')['authorize'];
+        $authorize = explode(',',$authorize);
+        if(in_array('2',$authorize)){
+            $this->is_manager = 1;
+        }
+        if(session('user')['username'] == 'admin') {
+            $this->is_admin = 1;
         }
     }
     /**

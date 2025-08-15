@@ -6,7 +6,6 @@ use app\admin\model\EquipmentModel;
 use app\admin\model\EquipmentUserBindModel as EUB;
 use app\admin\model\RechargeTaskModel as RT;
 use app\service\RechargeTaskService;
-use think\facade\Cache;
 use think\facade\View;
 use \PhpOffice\PhpSpreadsheet\IOFactory;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;

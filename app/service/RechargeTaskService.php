@@ -45,6 +45,9 @@ class RechargeTaskService
             if(isset($params['state']) and $params['state']){
                 $query = $query->where('state',$params['state']);
             }
+            if(isset($params['recharge_tel']) and $params['recharge_tel']){
+                $query = $query->where('recharge_tel',$params['recharge_tel']);
+            }
             if(isset($params['begin_time']) and $params['begin_time']){
                 $explode_time = explode(' - ',$params['begin_time']);
                 $params['begin_time'][0] = strtotime($explode_time[0]);
