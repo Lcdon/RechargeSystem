@@ -162,6 +162,19 @@ class User extends Controller
     }
 
     /**
+     * 更新用户余额更新开关状态
+     */
+    public function daily_balance_update_switch()
+    {
+        $this->_checkInput();
+        SystemUser::mSave($this->_vali([
+            'daily_balance_update_switch.in:0,1'  => '状态值范围异常！',
+            'daily_balance_update_switch.require' => '状态值不能为空！',
+        ]));
+    }
+
+
+    /**
      * 删除系统用户
      * @auth true
      */

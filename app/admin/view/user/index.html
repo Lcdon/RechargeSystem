@@ -63,6 +63,7 @@
                 {field: 'login_num', title: '{:lang("登录次数")}', align: 'center', minWidth: 100, sort: true},
                 {field: 'login_at', title: '{:lang("最后登录")}', align: 'center', minWidth: 170, sort: true},
                 {field: 'create_at', title: '{:lang("创建时间")}', align: 'center', minWidth: 170, sort: true},
+                {field: 'daily_balance_update_switch', title: 'switch ', align: 'center', minWidth: 110, templet: '#DailyBalanceUpdateSwitchTpl'},
                 {title: 'Daily Limit/Remain', align: 'center', minWidth: 170,templet:"<div>{{d.daily_limit}}/{{d.daily_limit_remain}}</div>"},
                 {toolbar: '#toolbar', title: '{:lang("操作面板")}', align: 'center', minWidth: 180, fixed: 'right'}
             ]]
@@ -80,6 +81,19 @@
                 return false;
             }, false);
         });
+
+        // 每日余额更新开关切换操作
+        layui.form.on('switch(DailyBalanceUpdateSwitch)', function (obj) {
+            var data = {id: obj.value, daily_balance_update_switch: obj.elem.checked > 0 ? 1 : 0};
+            $.form.load("{:url('daily_balance_update_switch')}", data, 'post', function (ret) {
+                if (ret.code < 1) $.msg.error(ret.info, 3, function () {
+                    $('#UserTable').trigger('reload');
+                }); else {
+                    $('#UserTable').trigger('reload')
+                }
+                return false;
+            }, false)
+        });
     });
 </script>
 
@@ -89,6 +103,14 @@
     <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="{:lang('已激活')}|{:lang('已禁用')}" lay-filter="StatusSwitch" {{-d.status>0?'checked':''}}>
     <!--{else}-->
     {{-d.status ? '<b class="color-green">{:lang("已激活")}</b>' : '<b class="color-red">{:lang("已禁用")}</b>'}}
+    <!--{/if}-->
+</script>
+
+<script type="text/html" id="DailyBalanceUpdateSwitchTpl">
+    <!--{if auth("state")}-->
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="{:lang('已激活')}|{:lang('已禁用')}" lay-filter="DailyBalanceUpdateSwitch" {{-d.daily_balance_update_switch>0?'checked':''}}>
+    <!--{else}-->
+    {{-d.daily_balance_update_switch ? '<b class="color-green">{:lang("已激活")}</b>' : '<b class="color-red">{:lang("已禁用")}</b>'}}
     <!--{/if}-->
 </script>
 

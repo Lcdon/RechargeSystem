@@ -9,7 +9,6 @@ use app\service\RechargeTaskService;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
-use think\facade\Cache;
 use think\facade\View;
 
 use \PhpOffice\PhpSpreadsheet\IOFactory;
@@ -26,9 +25,6 @@ use think\response\Json;
 
 class RechargeTask extends Base
 {
-    protected array $noNeedLogin = ['pop_task_api'];
-    protected array $noNeedAuth = ['pop_task_api'];
-
     protected SystemUser $system_user_model;
     protected EquipmentModel $equipment_model;
     protected EUB $equipment_user_bind_model;
@@ -310,7 +306,7 @@ class RechargeTask extends Base
             }
         }
 
-        if($user_id!=10000){//普通用户
+        if(!$this->is_admin and !$this->is_manager){//普通用户
             $equipment_id = $this->getUserEquipmentid($user_id);
             $user_equipment = EquipmentModel::where('id',$equipment_id)->find();
         }else{//管理员
@@ -323,7 +319,7 @@ class RechargeTask extends Base
 
         $list = [];
         foreach ($sheetData as $key=>$value){
-            if($user_id!=10000){
+            if(!$this->is_admin and !$this->is_manager){
                 $equipment = $user_equipment;
             }else{
                 if(!empty($value['equipment_name'])){
@@ -381,10 +377,10 @@ class RechargeTask extends Base
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    public function downExcel()
+    public function downExcel(): void
     {
         // 获取数据
-        if(session('user')['username']=='admin'){
+        if($this->is_admin or $this->is_manager){
             $query = RT::mQuery()
                 ->equal('system_user_id,equipment_id')
                 ->dateBetween('create_time,begin_time,recharge_time')
