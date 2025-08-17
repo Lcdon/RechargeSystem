@@ -9,7 +9,6 @@ use think\console\Input;
 //use think\console\input\Option;
 use think\console\Output;
 use app\service\RechargeTaskService;
-use think\facade\Queue;
 
 class pushTask extends Command
 {
