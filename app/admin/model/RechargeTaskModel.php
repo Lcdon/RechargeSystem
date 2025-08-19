@@ -8,7 +8,6 @@ class RechargeTaskModel extends Model
 {
     protected $table = 't4391_recharge_task_new';
 
-
     protected $fillable = ['name','system_user_id','equipment_id','state','create_time','begin_time','end_time'];
 
     public function equipment()
