@@ -77,14 +77,16 @@ class Login extends Controller
                 'verify.require'   => lang('图形验证码不能为空!'),
                 'uniqid.require'   => lang('图形验证标识不能为空!'),
             ]);
-            
-            if($data['username'] != 'admin'){
-                if(!isset($_POST['mac_address']) or empty($_POST['mac_address'])){
-                    $this->error("The getUserMacAddress script is not open!");
-                }
-                $allew_mac_address_list = WhiteMacAddressModel::column('mac_address');
-                if(!in_array($_POST['mac_address'],$allew_mac_address_list)){
-                    $this->error("The computer's Mac address is not allowed to log in!");
+
+            if(config('mac_address_check_switch')){
+                if($data['username'] != 'admin'){
+                    if(!isset($_POST['mac_address']) or empty($_POST['mac_address'])){
+                        $this->error("The getUserMacAddress script is not open!");
+                    }
+                    $allow_mac_address_list = WhiteMacAddressModel::column('mac_address');
+                    if(!in_array($_POST['mac_address'],$allow_mac_address_list)){
+                        $this->error("The computer's Mac address is not allowed to log in!");
+                    }
                 }
             }
             
