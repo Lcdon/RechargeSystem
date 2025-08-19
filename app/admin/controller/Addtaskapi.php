@@ -14,7 +14,7 @@ use think\db\exception\ModelNotFoundException;
 use think\facade\Cache;
 use think\response\Json;
 
-class AddTaskApi extends Controller
+class Addtaskapi extends Controller
 {
     /**
      * 添加任务
