@@ -164,7 +164,7 @@ class User extends Controller
     /**
      * 更新用户余额更新开关状态
      */
-    public function daily_balance_update_switch()
+    public function daily_balance_update_switch(): void
     {
         $this->_checkInput();
         SystemUser::mSave($this->_vali([
