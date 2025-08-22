@@ -276,7 +276,8 @@ class RechargeTask extends Base
         $cellName = [
             'A' => 'equipment_name',//设备名称
             'B' => 'recharge_tel',//充值电话
-            'C' => 'amount'//充值金额
+            'C' => 'amount',//充值金额
+            'D' => 'recharge_method'//充值方式
         ];
         //加载文件
         $spreadsheet = IOFactory::load($file);
@@ -346,6 +347,7 @@ class RechargeTask extends Base
                     'amount'=>$value['amount'],
                     'system_user_id'=>session('user')['id'],
                     'username' =>session('user')['username'],
+                    'recharge_method'=>$value['recharge_method'],
                     'state_msg' => '待分配'
                 ];
             }else{
@@ -356,6 +358,7 @@ class RechargeTask extends Base
                     'amount'=>$value['amount'],
                     'system_user_id'=>session('user')['id'],
                     'username' =>session('user')['username'],
+                    'recharge_method'=>$value['recharge_method'],
                     'state_msg' => '待分配'
                 ];
             }
@@ -409,6 +412,7 @@ class RechargeTask extends Base
         $sheet->setCellValue('I1', 'Recharge Result');
         $sheet->setCellValue('J1', 'Transaction ID');
         $sheet->setCellValue('K1', 'Balance');
+        $sheet->setCellValue('L1', 'Recharge Method');
 
         $sheet->getColumnDimension('A')->setWidth(20);
         $sheet->getColumnDimension('B')->setWidth(20);
@@ -421,6 +425,7 @@ class RechargeTask extends Base
         $sheet->getColumnDimension('I')->setWidth(20);
         $sheet->getColumnDimension('J')->setWidth(20);
         $sheet->getColumnDimension('K')->setWidth(20);
+        $sheet->getColumnDimension('L')->setWidth(20);
         $sheet->getStyle('A1:K1')->getFont()->setBold(true);
 
         // 设置表格内容
@@ -437,6 +442,7 @@ class RechargeTask extends Base
             $sheet->setCellValue('I' . $row, $item['recharge_result']);
             $sheet->setCellValue('J' . $row, $item['transaction_id']);
             $sheet->setCellValue('K' . $row, $item['balance']);
+            $sheet->setCellValue('L' . $row, $item['recharge_method']);
             $row++;
         }
 
@@ -452,18 +458,5 @@ class RechargeTask extends Base
         // 保存到输出流
         $writer->save('php://output');
         exit;
-    }
-
-    /**
-     * 更新system_user表的daily_limit_remain
-     */
-    public function user_daily_limit_update()
-    {
-        $result = $this->system_user_model->execute("UPDATE system_user set daily_limit_remain=daily_limit;");
-        if($result){
-            echo 'success';
-        }else{
-            echo 'error';
-        }
     }
 }
