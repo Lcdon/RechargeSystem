@@ -129,4 +129,47 @@ class Addtaskapi extends Controller
         View::assign('queues',$queues);
         return View::fetch('addtaskapi/get_redis_queues');
     }
+
+    /**
+     * 清空指定Redis队列
+     * @return Json
+     */
+    public function clearRedisQueue(): Json
+    {
+        // 获取队列名称参数
+        $queueName = input('queue_name');
+
+        // 参数验证
+        if (empty($queueName)) {
+            return json([
+                'code' => CodeMsg('fail'),
+                'msg' => 'queue_name is required'
+            ]);
+        }
+
+        try {
+            $redis = Cache::store('redis')->handler();
+
+            // 检查队列是否存在
+            if (!$redis->exists($queueName)) {
+                return json([
+                    'code' => CodeMsg('fail'),
+                    'msg' => 'queue does not exist'
+                ]);
+            }
+
+            // 清空队列
+            $redis->del($queueName);
+
+            return json([
+                'code' => CodeMsg('success'),
+                'msg' => 'queue cleared successfully'
+            ]);
+        } catch (\Exception $e) {
+            return json([
+                'code' => CodeMsg('fail'),
+                'msg' => 'clear queue failed: ' . $e->getMessage()
+            ]);
+        }
+    }
 }
