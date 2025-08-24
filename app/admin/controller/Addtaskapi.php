@@ -30,13 +30,7 @@ class Addtaskapi extends Controller
             'er_amount.require'=>'er_amount is null',
             'username.require'=>'username is null',
             'password.require'=>'password is null',
-            'task_type.require'=>'task_type is null',
         ]);
-        if($data['task_type']!='app' and $data['task_type']!='call'){
-            $response['code'] = CodeMsg('fail');
-            $response['msg'] = 'task_type is incorrect';
-            return json($response);
-        }
 
         $map = ['username' => $data['username'], 'is_deleted' => 0];
         $user = SystemUser::mk()->where($map)->findOrEmpty();
@@ -52,23 +46,19 @@ class Addtaskapi extends Controller
             $response['msg'] = 'password is incorrect';
             return json($response);
         }
-        if(!EUB::where('system_user_id',$user_id)->find()){
-            $response['code'] = CodeMsg('fail');
-            $response['msg'] = 'user is not bind equipment';
-            return json($response);
-        }
-        $equipment_id = EUB::where('system_user_id',$user_id)->find()->equipment_id;
-    
+
         if($data['er_amount']<5 or $data['er_amount']>200){
             $response['code'] = CodeMsg('fail');
             $response['msg'] = 'recharge er_amount needs to be between 5 and 200';
             return json($response);
         }
-        
+
+        $equipment_id = EUB::where('system_user_id',$user_id)->find()->equipment_id;
 //        $data['equipment_name'] = EquipmentModel::where(['id'=>$equipment_id])->find()->equipment_name;
         $data['system_user_id'] = $user_id;
         $data['state'] = 0;
         $data['state_msg'] = '待分配';
+        $data['equipment_id'] = $equipment_id;
 
         $data['recharge_tel'] = $data['msisdn'];
         $data['amount'] = $data['er_amount'];
