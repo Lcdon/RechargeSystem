@@ -66,7 +66,7 @@ class Addtaskapi extends Controller
         $data['state'] = 0;
         $data['state_msg'] = '待分配';
         if($equipment){
-            $data['equipment_id'] = $equipment->id;
+            $data['equipment_id'] = $equipment->equipment_id;
         }
 
         $data['recharge_tel'] = $data['msisdn'];

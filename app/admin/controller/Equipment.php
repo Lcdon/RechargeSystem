@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 
+use app\admin\model\EquipmentUserBindModel;
 use think\facade\View;
 use app\admin\model\EquipmentModel as EM;
 
@@ -108,8 +109,13 @@ class Equipment extends Base
      */
     public function remove()
     {
-        if(!isset($_POST['id']))
-            return json(['msg'=>'The parameters are incomplete'],CodeMsg('fail'));
+        $eub = EquipmentUserBindModel::where('equipment_id',$_POST['id'])->find();
+        if($eub){
+            $this->error('The device is in use, cannot be deleted');
+        }
+        if(!isset($_POST['id'])){
+            $this->error('The device is in use, cannot be deleted');
+        }
         EM::mDelete();
         $response['code'] = CodeMsg('success');
         $response['msg'] = 'success';

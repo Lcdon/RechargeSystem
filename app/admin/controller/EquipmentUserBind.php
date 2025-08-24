@@ -35,18 +35,30 @@ class EquipmentUserBind extends Base
         $data = $this->_vali([
             'page.require'=>'page is null',
             'limit.require'=>'limit is null',
-            '_order_.default'=>'asc'
+            '_order_.default'=>'asc',
+            'equipment_name.default'=>'',
+            'user.default'=>'',
         ]);
         $page = $data['page'];
         $limit = $data['limit'];
+
         $offset = ($page - 1) * $limit;
-        $binds = EUB::with(['equipment'=>function ($query) {
-            $query->withField('id,equipment_name');
-        }, 'user'=>function ($query) {
-            $query->withField('id,username,nickname');
-        }])
+        $query = new EUB();
+        if($data['user']){
+            $user_ids = SystemUser::where('username','like','%'.$data['user'].'%')->column('id');
+            if(!$user_ids){$user_ids=[0];}
+            $query = $query->whereIn('system_user_id',$user_ids);
+        }
+        if($data['equipment_name']){
+            $equipment_ids = EquipmentModel::where('equipment_name','like','%'.$data['equipment_name'].'%')->column('id');
+
+            if(!$equipment_ids){$equipment_ids=[0];}
+            $query = $query->whereIn('equipment_id',$equipment_ids);
+        }
+        $query = $query->with(['equipment','user'])
             ->limit($offset, $limit)
-            ->order('id '.$data['_order_'])
+            ->order('id '.$data['_order_']);
+        $binds = $query
             ->select()
             ->toArray();
         $response['code']   = 0;

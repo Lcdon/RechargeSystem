@@ -19,7 +19,7 @@
 
 {block name="content"}
 <div class="think-box-shadow">
-    {//include file='equipment/index_search'}
+    {include file='equipment_user_bind/index_search'}
     <table id="RoleTable" data-url="{:url('list')}" data-target-search="form.form-search"></table>
 </div>
 {/block}
@@ -36,7 +36,7 @@
                 {checkbox: true, fixed: true},
                 {field: 'id', title: '{:lang("ID")}', align: 'center', width: 100, sort: true},
                 {field: 'user.username', title: '{:lang("用户")}', align: 'center', minWidth: 170, templet: '<div>{{d.user.username||"-"}}</div>'},
-                {field: 'user.nickname', title: '{:lang("昵称")}', align: 'center', minWidth: 170, templet: '<div>{{d.user.nickname||"-"}}</div>'},
+                // {field: 'user.nickname', title: '{:lang("昵称")}', align: 'center', minWidth: 170, templet: '<div>{{d.user.nickname||"-"}}</div>'},
                 {field: 'equipment_id', title: '{:lang("设备ID")}', align: 'center', minWidth: 140},
                 {field: 'equipment.equipment_name', title: '{:lang("设备名称")}', align: 'center', minWidth: 110, templet: '<div>{{d.equipment.equipment_name||"-"}}</div>'},
                 {field: 'create_time', title: '{:lang("创建时间")}', align: 'center', minWidth: 110},
