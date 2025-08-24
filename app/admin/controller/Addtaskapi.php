@@ -60,12 +60,14 @@ class Addtaskapi extends Controller
             return json($response);
         }
 
-        $equipment_id = EUB::where('system_user_id',$user_id)->find()->equipment_id;
+        $equipment = EUB::where('system_user_id',$user_id)->find();
 //        $data['equipment_name'] = EquipmentModel::where(['id'=>$equipment_id])->find()->equipment_name;
         $data['system_user_id'] = $user_id;
         $data['state'] = 0;
         $data['state_msg'] = '待分配';
-        $data['equipment_id'] = $equipment_id;
+        if($equipment){
+            $data['equipment_id'] = $equipment->id;
+        }
 
         $data['recharge_tel'] = $data['msisdn'];
         $data['amount'] = $data['er_amount'];
