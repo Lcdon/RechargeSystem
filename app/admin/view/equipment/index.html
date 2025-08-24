@@ -28,6 +28,7 @@
                 {checkbox: true, fixed: true},
                 {field: 'id', title: '{:lang("ID")}', align: 'center', width: 100},
                 {field: 'sort', title: 'sort', align: 'center', width: 20},
+                {field: 'assignment_status', title: 'Assignment Status', align: 'center', minWidth: 140,templet: '#AssignmentStatusSwitch'},
                 {field: 'recharge_method', title: 'Method', align: 'center', width: 80},
                 // {field: 'equipment_id', title: '{:lang("设备ID")}', align: 'center', minWidth: 140},
                 {field: 'equipment_name', title: 'Equipment Name', align: 'center', minWidth: 110, templet: '<div>{{d.equipment_name||"-"}}</div>'},
@@ -36,7 +37,7 @@
                 {field: 'password', title: 'Umrex Password', align: 'center', minWidth: 140},
                 {field: 'recharge_id', title: 'Recharge ID', align: 'center', minWidth: 140},
                 {field: 'recharge_password', title: 'Recharge Password', align: 'center', minWidth: 140},
-                // templet: '#StatusSwitchRoleTableTpl'
+                // templet: '#StatusSwitchRoleTableTpl',
                 // {field: 'initiate_state', title: '{:lang("启动状态")}', align: 'center', minWidth: 140,templet: '#EquipmentStatusSwitch'},
                 // {field: 'equipment_state', title: '{:lang("设备状态")}', align: 'center', minWidth: 140},
                 // {field: 'equipment_task_state', title: '{:lang("设备执行状态")}', align: 'center', minWidth: 140},
@@ -47,9 +48,9 @@
         });
 
         // 数据状态切换操作
-        layui.form.on('switch(equipment_state_switch)', function (object) {
-            var data = {id:object.value,initiate_state:object.elem.checked > 0 ? 1 : 0}
-            $.form.load("{:url('initiate_state')}", data, 'post', function (ret) {
+        layui.form.on('switch(assignment_status_switch)', function (object) {
+            var data = {id:object.value,assignment_status:object.elem.checked > 0 ? 1 : 0}
+            $.form.load("{:url('assignment_status')}", data, 'post', function (ret) {
                 if (ret.code < 1) $.msg.error(ret.info, 3, function () {
                     $('#RoleTable').trigger('reload');
                 }); else {
@@ -72,9 +73,17 @@
 <!--</script>-->
 
 <!--&lt;!&ndash; 数据状态切换模板 &ndash;&gt;-->
-<script type="text/html" id="EquipmentStatusSwitch">
+<!--<script type="text/html" id="EquipmentStatusSwitch">-->
+<!--    {if auth("initiate_state")}-->
+<!--    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="ON|OFF" lay-filter="equipment_state_switch" {{-d.initiate_state>0?'checked':''}}>-->
+<!--    {else}-->
+<!--    {{-d.status ? '<b class="color-green">{:lang("已启用")}</b>' : '<b class="color-red">{:lang("已禁用")}</b>'}}-->
+<!--    {/if}-->
+<!--</script>-->
+
+<script type="text/html" id="AssignmentStatusSwitch">
     {if auth("initiate_state")}
-    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="ON|OFF" lay-filter="equipment_state_switch" {{-d.initiate_state>0?'checked':''}}>
+    <input type="checkbox" value="{{d.id}}" lay-skin="switch" lay-text="ON|OFF" lay-filter="assignment_status_switch" {{-d.assignment_status>0?'checked':''}}>
     {else}
     {{-d.status ? '<b class="color-green">{:lang("已启用")}</b>' : '<b class="color-red">{:lang("已禁用")}</b>'}}
     {/if}

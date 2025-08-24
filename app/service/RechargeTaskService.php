@@ -104,13 +104,18 @@ class RechargeTaskService
             }else{
                 $item = $this->equipment_user_bind_model
                     ->alias('eub')
-                    ->leftJoin($this->system_user_model->getTable().' u','eub.system_user_id=u.id')
-                    ->where('u.daily_limit_remain','>',$task['amount'])
-                    ->order('sort')
-                    ->find()->toArray();
-                $this->recharge_task_model->where('id',$task['id'])->update(['equipment_id'=>$item['equipment_id']]);
+                    ->with(['user'=>function ($query) use ($task) {
+                        $query->where('daily_limit_remain','>',$task['amount']);
+                    }])
+                    ->leftJoin($this->equipment_model->getTable().' e','eub.equipment_id=e.id')
+                    ->where('e.assignment_status',1)
+                    ->order('e.sort')
+                    ->limit(1)
+                    ->select()->toArray();
+                $item = $item[0] ?? [];
                 if($item){
                     $queue_name = 'equipment_'.$item['equipment_id'];
+                    $this->recharge_task_model->where('id',$task['id'])->update(['equipment_id'=>$item['equipment_id']]);
                 }else{
                     continue;
                 }

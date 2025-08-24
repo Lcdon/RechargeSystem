@@ -131,4 +131,10 @@ class Equipment extends Base
         $data = $this->_vali(['id.require'=>'id is null','initiate_state.require'=>'initiate_state is null']);
         EM::mSave($data);
     }
+
+    public function assignment_status()
+    {
+        $data = $this->_vali(['id.require'=>'id is null','assignment_status.require'=>'assignment_status is null']);
+        EM::mSave($data);
+    }
 }
