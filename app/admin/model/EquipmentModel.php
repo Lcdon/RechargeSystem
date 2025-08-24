@@ -21,12 +21,6 @@ class EquipmentModel extends Model
         return $status[$value];
     }
 
-    //启动状态
-//    public function getInitiateStateAttr($value)
-//    {
-//        $status = [0=>'停用',1=>'启用'];
-//        return $status[$value];
-//    }
 
     public function equipment_user_bind()
     {
@@ -34,8 +28,5 @@ class EquipmentModel extends Model
     }
 
     protected $insert = [
-        // 其他字段
-        // '', // 如果有这个字段，注释掉或移除
     ];
-
 }

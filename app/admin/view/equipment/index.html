@@ -11,7 +11,7 @@
 
 {block name="content"}
 <div class="think-box-shadow">
-    {//include file='equipment/index_search'}
+    {include file='equipment/index_search'}
     <table id="RoleTable" data-url="{:url('list')}" data-target-search="form.form-search"></table>
 </div>
 {/block}
@@ -28,17 +28,19 @@
                 {checkbox: true, fixed: true},
                 {field: 'id', title: '{:lang("ID")}', align: 'center', width: 100},
                 {field: 'sort', title: 'sort', align: 'center', width: 20},
+                {field: 'recharge_method', title: 'Method', align: 'center', width: 80},
                 // {field: 'equipment_id', title: '{:lang("设备ID")}', align: 'center', minWidth: 140},
                 {field: 'equipment_name', title: 'Equipment Name', align: 'center', minWidth: 110, templet: '<div>{{d.equipment_name||"-"}}</div>'},
-                {field: 'create_time', title: '{:lang("创建时间")}', align: 'center', minWidth: 110},
+                // {field: 'create_time', title: '{:lang("创建时间")}', align: 'center', minWidth: 110},
                 {field: 'account', title: 'Umrex ID', align: 'center', minWidth: 170},
                 {field: 'password', title: 'Umrex Password', align: 'center', minWidth: 140},
                 {field: 'recharge_id', title: 'Recharge ID', align: 'center', minWidth: 140},
                 {field: 'recharge_password', title: 'Recharge Password', align: 'center', minWidth: 140},
                 // templet: '#StatusSwitchRoleTableTpl'
-                {field: 'initiate_state', title: '{:lang("启动状态")}', align: 'center', minWidth: 140,templet: '#EquipmentStatusSwitch'},
-                {field: 'equipment_state', title: '{:lang("设备状态")}', align: 'center', minWidth: 140},
-                {field: 'equipment_task_state', title: '{:lang("设备执行状态")}', align: 'center', minWidth: 140},
+                // {field: 'initiate_state', title: '{:lang("启动状态")}', align: 'center', minWidth: 140,templet: '#EquipmentStatusSwitch'},
+                // {field: 'equipment_state', title: '{:lang("设备状态")}', align: 'center', minWidth: 140},
+                // {field: 'equipment_task_state', title: '{:lang("设备执行状态")}', align: 'center', minWidth: 140},
+                {field: 'create_time', title: '{:lang("创建时间")}', align: 'center', minWidth: 110},
                 {field: 'remark', title: '{:lang("备注")}', align: '备注', minWidth: 140},
                 {toolbar: '#toolbar', title: '{:lang("操作面板")}', align: 'center', minWidth: 180, fixed: 'right'}
             ]]

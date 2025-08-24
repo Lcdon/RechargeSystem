@@ -66,11 +66,13 @@ class RechargeTaskService
                 $params['recharge_time'][1] = strtotime($explode_time[1]);
                 $query = $query->whereBetween('recharge_time',$params['recharge_time']);
             }
-            if(isset($params['recharge_method']) and $params['recharge_method']){
-                $query = $query->where('recharge_method',$params['recharge_method']);
-            }
+//            if(isset($params['recharge_method']) and $params['recharge_method']){
+//                $query = $query->where('recharge_method',$params['recharge_method']);
+//            }
             $count = $query->count();
-            $items = $query->page($page, $limit)->select();
+            $items = $query
+                ->with('equipment')
+                ->page($page, $limit)->select();
             return ['code'=>0, 'count'=>$count, 'data'=>$items];
         }catch (\Exception $e){
             return ['code'=>CodeMsg('fail'), 'msg'=>$e->getMessage()];
@@ -97,9 +99,8 @@ class RechargeTaskService
         $redis = Cache::store('redis')->handler();
         $recharge_task = $this->recharge_task_model->where('state',0)->select()->toArray();
         foreach ($recharge_task as $task){
-            $recharge_method = $task['recharge_method'];
             if($task['equipment_id']){
-                $queue_name = $recharge_method.'_equipment_'.$task['equipment_id'];
+                $queue_name = 'equipment_'.$task['equipment_id'];
             }else{
                 $item = $this->equipment_user_bind_model
                     ->alias('eub')
@@ -108,7 +109,7 @@ class RechargeTaskService
                     ->order('sort')
                     ->find()->toArray();
                 if($item){
-                    $queue_name = $recharge_method.'_equipment_'.$item['equipment_id'];
+                    $queue_name = 'equipment_'.$item['equipment_id'];
                 }else{
                     continue;
                 }
@@ -122,4 +123,6 @@ class RechargeTaskService
             }
         }
     }
+
+
 }

@@ -54,4 +54,5 @@ return [
     'lang' => 'en',
 
     'mac_address_check_switch' => false,
+    'recharge_method' => ['app','tel'],
 ];

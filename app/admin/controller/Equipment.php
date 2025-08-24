@@ -11,6 +11,11 @@ use app\admin\model\EquipmentModel as EM;
  */
 class Equipment extends Base
 {
+    public function __construct()
+    {
+        $recharge_method = config('app.recharge_method');
+        View::assign('recharge_method',$recharge_method);
+    }
     /**
      * 设备管理
      * @auth true
@@ -38,9 +43,20 @@ class Equipment extends Base
         else $page = $_POST['page'];
         if(!isset($_POST['limit'])) $limit = 10;
         else $limit = $_POST['limit'];
-        $list = EM::limit(($page-1)*$limit,$limit)->select()->toArray();
-//        dump($list);die;
-        $count = EM::count();
+        $where = [];
+        if(isset($_POST['equipment_name']) && $_POST['equipment_name']!=''){
+            $where[] = ['equipment_name','like','%'.$_POST['equipment_name'].'%'];
+        }
+        if(isset($_POST['recharge_method']) && $_POST['recharge_method']!=''){
+            $where[] = ['recharge_method','=',$_POST['recharge_method']];
+        }
+        $equipment_model = new EM();
+        $list = $equipment_model
+            ->where($where)
+            ->limit(($page-1)*$limit,$limit)
+            ->select()
+            ->toArray();
+        $count = $equipment_model->count();
         $data['code'] = 0;
         $data['count'] = $count;
         $data['data'] = $list;

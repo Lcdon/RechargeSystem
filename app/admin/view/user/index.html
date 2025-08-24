@@ -40,7 +40,7 @@
             where: {type: '{$type|default="index"}'},
             cols: [[
                 {checkbox: true, fixed: true},
-                {field: 'sort', title: '{:lang("排序权重")}', width: 100, align: 'center', sort: true, templet: '#SortInputTpl'},
+                // {field: 'sort', title: '{:lang("排序权重")}', width: 100, align: 'center', sort: true, templet: '#SortInputTpl'},
                 {
                     field: 'headimg', title: '{:lang("头像")}', width: 60, align: 'center', templet: function (d) {
                         if (!d.headimg) return '-';
@@ -60,9 +60,9 @@
                 // {field: 'contact_mail', title: '联系邮箱', minWidth: 80, templet: '<div>{{d.contact_mail||"-"}}</div>'},
                 // {field: 'contact_phone', title: '联系电话', minWidth: 80, templet: '<div>{{d.contact_phone||"-"}}</div>'},
                 {field: 'status', title: '{:lang("使用状态")}', align: 'center', minWidth: 110, templet: '#StatusSwitchTpl'},
-                {field: 'login_num', title: '{:lang("登录次数")}', align: 'center', minWidth: 100, sort: true},
-                {field: 'login_at', title: '{:lang("最后登录")}', align: 'center', minWidth: 170, sort: true},
-                {field: 'create_at', title: '{:lang("创建时间")}', align: 'center', minWidth: 170, sort: true},
+                // {field: 'login_num', title: '{:lang("登录次数")}', align: 'center', minWidth: 100, sort: true},
+                // {field: 'login_at', title: '{:lang("最后登录")}', align: 'center', minWidth: 170, sort: true},
+                // {field: 'create_at', title: '{:lang("创建时间")}', align: 'center', minWidth: 170, sort: true},
                 {field: 'daily_balance_update_switch', title: 'switch ', align: 'center', minWidth: 110, templet: '#DailyBalanceUpdateSwitchTpl'},
                 {title: 'Daily Limit/Remain', align: 'center', minWidth: 170,templet:"<div>{{d.daily_limit}}/{{d.daily_limit_remain}}</div>"},
                 {toolbar: '#toolbar', title: '{:lang("操作面板")}', align: 'center', minWidth: 180, fixed: 'right'}

@@ -32,7 +32,12 @@
                 {field: 'id', title: 'ID', align: 'center', width: 100, sort: true},
                 {field: 'username', title: 'Creator', align: 'center', width: 100},
                 {field: 'equipment_name', title: 'Code Name', align: 'center', minWidth: 110,templet: '<div>{{d.equipment_name||"-"}}</div>',hide:!showCodeName},
-                {field: 'recharge_method', title: 'Method', align: 'center', width: 100},
+                {title: 'Method', align: 'center', width: 100,templet: function (d){
+                    if(d.equipment){
+                        return d.equipment.recharge_method;
+                    }
+                    return '-';
+                }},
                 {field: 'recharge_tel', title: 'MSISDN', align: 'center', minWidth: 170},
                 {field: 'amount', title: 'ER Amount', align: 'center', minWidth: 140},
                 {field: 'state', title: 'Status', align: 'center', minWidth: 140, templet:function (d){
@@ -56,7 +61,7 @@
                 {field: 'recharge_time', title: 'ER Time', align: 'center', minWidth: 140},
                 {field: 'user_balance', title: 'user_balance', align: 'center', minWidth: 140},
                 // templet: '#StatusSwitchRoleTableTpl'
-                {toolbar: '#toolbar', title: 'Cancel Task', align: 'center', minWidth: 180, fixed: 'right'}
+                {toolbar: '#toolbar', title: 'Cancel Task', align: 'center', minWidth: 150, fixed: 'right'}
             ]]
         });
     });

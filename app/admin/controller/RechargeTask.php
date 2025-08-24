@@ -133,12 +133,12 @@ class RechargeTask extends Base
             $params['equipment_id'] = input('equipment_id','');
             $params['system_user_id'] = session('user')['id'];
             $params['username'] = session('user')['username'];
-            $params['recharge_method'] = input('recharge_method');
             if($params['equipment_id']){
                 $params['equipment_name'] = $this->equipment_model
                     ->where('id',$params['equipment_id'])
                     ->value('equipment_name');
             }
+
             $params['state'] = 0;
             $params['state_msg'] = 'waiting';
             $params['create_time'] = date('Y-m-d H:i:s');

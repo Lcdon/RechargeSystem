@@ -93,9 +93,8 @@ class Addtaskapi extends Controller
     public function pop_task_api(): Json
     {
         $equipment_id = input('equipment_id');
-        $method = input('method');
         $redis = Cache::store('redis')->handler();
-        $queue_name = $method.'_equipment_'.$equipment_id;
+        $queue_name = 'equipment_'.$equipment_id;
         $task = $redis->rpop($queue_name);
         if($task){
             return json(['code'=>1,'msg'=>'success','data'=>$task]);
