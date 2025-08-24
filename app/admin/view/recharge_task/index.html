@@ -31,7 +31,12 @@
                 {checkbox: true, fixed: true},
                 {field: 'id', title: 'ID', align: 'center', width: 100, sort: true},
                 {field: 'username', title: 'Creator', align: 'center', width: 100},
-                {field: 'equipment_name', title: 'Code Name', align: 'center', minWidth: 110,templet: '<div>{{d.equipment_name||"-"}}</div>',hide:!showCodeName},
+                {field: 'equipment_name', title: 'Code Name', align: 'left', minWidth: 110,hide:!showCodeName,templet: function (d){
+                    if(d.equipment){
+                        return '('+d.equipment.id+')'+d.equipment.equipment_name;
+                    }
+                    return '-';
+                    },},
                 {title: 'Method', align: 'center', width: 100,templet: function (d){
                     if(d.equipment){
                         return d.equipment.recharge_method;

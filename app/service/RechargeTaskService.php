@@ -108,6 +108,7 @@ class RechargeTaskService
                     ->where('u.daily_limit_remain','>',$task['amount'])
                     ->order('sort')
                     ->find()->toArray();
+                $this->recharge_task_model->where('id',$task['id'])->update(['equipment_id'=>$item['equipment_id']]);
                 if($item){
                     $queue_name = 'equipment_'.$item['equipment_id'];
                 }else{
