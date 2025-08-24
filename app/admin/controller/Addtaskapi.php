@@ -39,6 +39,13 @@ class Addtaskapi extends Controller
             $response['msg'] = 'username is not exist';
             return json($response);
         }
+
+        if($user->status==0){
+            $response['code'] = CodeMsg('fail');
+            $response['msg'] = 'user is disabled';
+            return json($response);
+        }
+
         $user_id = $user->id;
 
         if(md5($data['password'])!=$user->password){
