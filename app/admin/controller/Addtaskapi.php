@@ -103,8 +103,47 @@ class Addtaskapi extends Controller
         }
     }
 
-    public function look_task_api(): Json
-    {
 
+    /**
+     * 查看Redis队列状态
+     * @return Json
+     */
+    public function getRedisQueues(): Json
+    {
+        try {
+            $redis = Cache::store('redis')->handler();
+
+            // 获取所有设备相关队列
+            $equipmentKeys = $redis->keys('equipment_*');
+            $rechargeMethodKeys = $redis->keys('*_equipment_*');
+
+            // 合并并去重队列键
+            $allKeys = array_unique(array_merge($equipmentKeys, $rechargeMethodKeys));
+
+            $queues = [];
+            foreach ($allKeys as $key) {
+                $queues[] = [
+                    'queue_name' => $key,
+                    'length' => $redis->llen($key),
+                    'update_time' => date('Y-m-d H:i:s')
+                ];
+            }
+
+            // 按队列名称排序
+            usort($queues, function($a, $b) {
+                return strcmp($a['queue_name'], $b['queue_name']);
+            });
+
+            return json([
+                'code' => CodeMsg('success'),
+                'msg' => '获取队列状态成功',
+                'data' => $queues
+            ]);
+        } catch (\Exception $e) {
+            return json([
+                'code' => CodeMsg('fail'),
+                'msg' => '获取队列状态失败: ' . $e->getMessage()
+            ]);
+        }
     }
 }
