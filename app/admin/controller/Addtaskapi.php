@@ -6,13 +6,13 @@ use think\admin\Controller;
 use app\admin\model\EquipmentUserBindModel as EUB;
 use app\admin\model\EquipmentModel;
 use app\admin\model\RechargeTaskModel as RT;
-use app\admin\model\RechargeTaskTelModel as RTT;
 use think\admin\model\SystemUser;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
 use think\facade\Cache;
 use think\response\Json;
+use think\facade\View;
 
 class Addtaskapi extends Controller
 {
@@ -65,7 +65,7 @@ class Addtaskapi extends Controller
             return json($response);
         }
         
-        $data['equipment_name'] = EquipmentModel::where(['id'=>$equipment_id])->find()->equipment_name;
+//        $data['equipment_name'] = EquipmentModel::where(['id'=>$equipment_id])->find()->equipment_name;
         $data['system_user_id'] = $user_id;
         $data['state'] = 0;
         $data['state_msg'] = '待分配';
@@ -75,11 +75,7 @@ class Addtaskapi extends Controller
         unset($data['msisdn']);
         unset($data['er_amount']);
 
-        if ($data['task_type']=='app'){
-            $add = new RT;
-        }else{
-            $add = new RTT;
-        }
+        $add = new RT;
         $add->save($data);
         $response['code'] = CodeMsg('success');
         $response['msg'] = 'success';
@@ -106,44 +102,34 @@ class Addtaskapi extends Controller
 
     /**
      * 查看Redis队列状态
-     * @return Json
      */
-    public function getRedisQueues(): Json
+    public function getRedisQueues(): string
     {
-        try {
-            $redis = Cache::store('redis')->handler();
 
-            // 获取所有设备相关队列
-            $equipmentKeys = $redis->keys('equipment_*');
-            $rechargeMethodKeys = $redis->keys('*_equipment_*');
+        $redis = Cache::store('redis')->handler();
 
-            // 合并并去重队列键
-            $allKeys = array_unique(array_merge($equipmentKeys, $rechargeMethodKeys));
+        // 获取所有设备相关队列
+        $equipmentKeys = $redis->keys('equipment_*');
+        $rechargeMethodKeys = $redis->keys('*_equipment_*');
 
-            $queues = [];
-            foreach ($allKeys as $key) {
-                $queues[] = [
-                    'queue_name' => $key,
-                    'length' => $redis->llen($key),
-                    'update_time' => date('Y-m-d H:i:s')
-                ];
-            }
+        // 合并并去重队列键
+        $allKeys = array_unique(array_merge($equipmentKeys, $rechargeMethodKeys));
 
-            // 按队列名称排序
-            usort($queues, function($a, $b) {
-                return strcmp($a['queue_name'], $b['queue_name']);
-            });
-
-            return json([
-                'code' => CodeMsg('success'),
-                'msg' => '获取队列状态成功',
-                'data' => $queues
-            ]);
-        } catch (\Exception $e) {
-            return json([
-                'code' => CodeMsg('fail'),
-                'msg' => '获取队列状态失败: ' . $e->getMessage()
-            ]);
+        $queues = [];
+        foreach ($allKeys as $key) {
+            $queues[] = [
+                'queue_name' => $key,
+                'length' => $redis->llen($key),
+                'update_time' => date('Y-m-d H:i:s')
+            ];
         }
+
+        // 按队列名称排序
+        usort($queues, function($a, $b) {
+            return strcmp($a['queue_name'], $b['queue_name']);
+        });
+
+        View::assign('queues',$queues);
+        return View::fetch('addtaskapi/get_redis_queues');
     }
 }

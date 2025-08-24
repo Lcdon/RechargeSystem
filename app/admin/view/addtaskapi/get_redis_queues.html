@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Redis队列状态监控</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <style>
+        .container {padding: 20px;}
+        .queue-table {margin-top: 20px;}
+        .title {margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="title">Redis队列状态列表</h2>
+    <table class="layui-table queue-table">
+        <colgroup>
+            <col width="40%">
+            <col width="20%">
+            <col width="40%">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>队列名称</th>
+            <th>队列长度</th>
+            <th>更新时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="queues" id="queue"}
+        <tr>
+            <td>{$queue.queue_name}</td>
+            <td>{$queue.length}</td>
+            <td>{$queue.update_time}</td>
+        </tr>
+        {/volist}
+        {empty name="queues"}
+        <tr>
+            <td colspan="3" style="text-align:center;">暂无队列数据</td>
+        </tr>
+        {/empty}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
