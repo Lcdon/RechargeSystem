@@ -15,7 +15,7 @@
                     </label>
                     <select lay-search="" name="recharge_method" lay-verify="required">
                         {foreach $recharge_method as $v}
-                        <option value="{$v}" {if $vo.recharge_method==$v}selected{/if}>{$v}</option>
+                        <option value="{$v}" {if isset($vo.recharge_method) && $vo.recharge_method eq $v}selected{/if}>{$v}</option>
                         {/foreach}
                     </select>
                 </div>
